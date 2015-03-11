@@ -5,6 +5,7 @@ glowfi.sh in iOS for the Big Web
 **Installation**
 
     Download Glowfish.swift and drop it in your app...seriously, that's it.
+    Also, make sure to get the amazing framework https://github.com/Alamofire/Alamofire which is used for our framework.
 
 **Setup**
 
@@ -51,3 +52,7 @@ It's important to note that predicting will throw an error if you have not train
 
 Docs - http://glowfish.readme.io/  
 Registration - http://glowfi.sh/
+
+**Thank You**
+
+Thanks so much to Matt Thompson (@matt) for creating Alamofire. Big props.
