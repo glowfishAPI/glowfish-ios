@@ -11,10 +11,19 @@ import Foundation
 let STATIC_GLOWFISH_URL: String = "https://api.glowfi.sh/"
 let STATIC_GLOWFISH_VERSION: String = "v1"
 
-public class Glowfish {
+@objc protocol GlowFishDelegate {
+    optional func updatedLog(message: String)
+}
+
+public class Glowfish: NSObject {
     var sid: String! = nil
     var token: String! = nil
     var verbose: Bool = false
+    var log: [String]? = nil
+    
+    private var options: [String: AnyObject]? = nil
+    
+    var delegate: GlowFishDelegate?
     //private(set) var allResults: Bool! = false
     
     class var glower: Glowfish {
@@ -43,37 +52,122 @@ public class Glowfish {
     
     func log(message: AnyObject!){
         if self.verbose {
-            println(message)
+            if self.log == nil {
+                self.log = [(message as String)]
+            }
+        } else {
+            self.log!.append(message as String!)
+        }
+        
+        if self.delegate != nil {
+            self.delegate!.updatedLog?(message as String)
         }
     }
     
+    func resetLog(){
+        self.log = nil
+    }
+    
     func train(data: [String: AnyObject], response: [String: AnyObject], complete: (objects: [String: AnyObject]?, error: NSError?) -> ()){
+        self.train(data, response: response, options: nil, complete: complete)
+    }
+    
+    func train(data: [String: AnyObject], response: [String: AnyObject], options: [String: AnyObject]?, complete: (objects: [String: AnyObject]?, error: NSError?) -> ()){
+        self.options = options
+        
         self.glowfishRequest(["data_set": data, "response": response], endpoint: "train") { (objects, error) -> () in
             complete(objects: objects, error: error)
         }
     }
     
-    func predict(data: [String: AnyObject], response: [String: AnyObject], complete: (objects: [String: AnyObject]?, error: NSError?) -> ()){
-        self.glowfishRequest(["data_set": data, "response": response], endpoint: "predict") { (objects, error) -> () in
+    func predict(data: [String: AnyObject], response: [String: AnyObject]?, complete: (objects: [String: AnyObject]?, error: NSError?) -> ()){
+        self.predict(data, response: response, options: nil, complete: complete)
+    }
+    
+    func predict(data: [String: AnyObject], response: [String: AnyObject]?, options: [String: AnyObject]?, complete: (objects: [String: AnyObject]?, error: NSError?) -> ()){
+        self.options = options
+        
+        var set = ["data_set": data]
+        if response != nil {
+            set["response"] = response!
+        }
+        
+        self.glowfishRequest(set, endpoint: "predict") { (objects, error) -> () in
             complete(objects: objects, error: error)
         }
     }
     
-    func cluster(data: [String: AnyObject], response: [String: AnyObject], complete: (objects: [String: AnyObject]?, error: NSError?) -> ()){
-        self.glowfishRequest(["data_set": data, "response": response], endpoint: "cluster") { (objects, error) -> () in
+    func cluster(data: [String: AnyObject], response: [String: AnyObject]?, complete: (objects: [String: AnyObject]?, error: NSError?) -> ()){
+        self.cluster(data, response: response, options: nil, complete: complete)
+    }
+    
+    func cluster(data: [String: AnyObject], response: [String: AnyObject]?, options: [String: AnyObject]?, complete: (objects: [String: AnyObject]?, error: NSError?) -> ()){
+        self.options = options
+        
+        var set = ["data_set": data]
+        if response != nil {
+            set["response"] = response!
+        }
+        
+        self.glowfishRequest(set, endpoint: "cluster") { (objects, error) -> () in
             complete(objects: objects, error: error)
         }
     }
     
-    func featureSelect(data: [String: AnyObject], response: [String: AnyObject], complete: (objects: [String: AnyObject]?, error: NSError?) -> ()){
-        self.glowfishRequest(["data_set": data, "response": response], endpoint: "feature_select") { (objects, error) -> () in
+    func featureSelect(data: [String: AnyObject], response: [String: AnyObject]?, complete: (objects: [String: AnyObject]?, error: NSError?) -> ()){
+        self.featureSelect(data, response: response, options: nil, complete: complete)
+    }
+    
+    func featureSelect(data: [String: AnyObject], response: [String: AnyObject]?, options: [String: AnyObject]?, complete: (objects: [String: AnyObject]?, error: NSError?) -> ()){
+        self.options = options
+        
+        var set = ["data_set": data]
+        if response != nil {
+            set["response"] = response!
+        }
+        
+        self.glowfishRequest(set, endpoint: "feature_select") { (objects, error) -> () in
             complete(objects: objects, error: error)
         }
     }
     
-    func glowfishRequest(data: [String: AnyObject], endpoint: String, complete: (objects: [String: AnyObject]?, error: NSError?) -> ()){
+    func filterTrain(userids: [AnyObject], productids: [AnyObject], ratings: [AnyObject], complete: (objects: [String: AnyObject]?, error: NSError?) -> ()){
+        self.filterTrain(userids, productids: productids, ratings: ratings, options: nil, complete: complete)
+    }
+    
+    func filterTrain(userids: [AnyObject], productids: [AnyObject], ratings: [AnyObject], options: [String: AnyObject]?, complete: (objects: [String: AnyObject]?, error: NSError?) -> ()){
+        self.options = options
+        
+        var set = ["data_set": ["userid": userids, "productid": productids, "rating": ratings]]
+        
+        self.glowfishRequest(set, endpoint: "filter_train") { (objects, error) -> () in
+            complete(objects: objects, error: error)
+        }
+    }
+    
+    func filterPredict(userids: [AnyObject], productids: [AnyObject], ratings: [AnyObject], complete: (objects: [String: AnyObject]?, error: NSError?) -> ()){
+        self.filterPredict(userids, productids: productids, ratings: ratings, options: nil, complete: complete)
+    }
+    
+    func filterPredict(userids: [AnyObject], productids: [AnyObject], ratings: [AnyObject], options: [String: AnyObject]?, complete: (objects: [String: AnyObject]?, error: NSError?) -> ()){
+        self.options = options
+        
+        var set = ["data_set": ["userid": userids, "productid": productids, "rating": ratings]]
+        
+        self.glowfishRequest(set, endpoint: "filter_predict") { (objects, error) -> () in
+            complete(objects: objects, error: error)
+        }
+    }
+    
+    func glowfishRequest(var data: [String: AnyObject], endpoint: String, complete: (objects: [String: AnyObject]?, error: NSError?) -> ()){
         let startDate: NSDate = NSDate()
         self.log("Started request to endpoint \(endpoint)")
+        
+        if self.options != nil {
+            for (key, value) in self.options! {
+                data[key] = value
+            }
+        }
         
         let URL = NSURL(string: Glowfish.endpoint(endpoint: endpoint))!
         let mutableURLRequest = NSMutableURLRequest(URL: URL)

@@ -1,5 +1,5 @@
 
-glowfi.sh in iOS for the Big Web
+glowfi.sh in iOS for the Big Web: Now with machine guns and rocket launchers.
 -----------
 
 **Installation**
