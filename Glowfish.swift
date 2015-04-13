@@ -53,14 +53,20 @@ public class Glowfish: NSObject {
     func log(message: AnyObject!){
         if self.verbose {
             if self.log == nil {
-                self.log = [(message as String)]
+                if let mm = message as? String {
+                    self.log = [mm]
+                }
             }
         } else {
-            self.log!.append(message as String!)
+            if let mm = message as? String {
+                self.log!.append(mm)
+            }
         }
         
         if self.delegate != nil {
-            self.delegate!.updatedLog?(message as String)
+            if let mm = message as? String {
+                self.delegate!.updatedLog?(mm)
+            }
         }
     }
     
