@@ -16,7 +16,7 @@ func application(application: UIApplication, didFinishLaunchingWithOptions launc
 
 ### Changing the training set
 
-There may be times throughout your application to group training sets that may not necessarily correspond to each other.
+Training sets are sets of user events recorded during mobile app sessions that glowfi.sh uses to make future recommendations. There may be times throughout your application to group training sets that may not necessarily correspond to each other (e.g., user networks).
 
 glowfi.sh has created app sets specifically for this purpose.
 
