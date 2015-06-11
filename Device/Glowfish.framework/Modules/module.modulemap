@@ -1,0 +1,3 @@
+framework module Glowfish {
+    header "Glowfish-Swift.h"
+}
