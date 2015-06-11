@@ -11,14 +11,14 @@ import Glowfish
 class AppDelegate: UIResponder, UIApplicationDelegate {
 ...
 func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-	Glowfish.setCredentials("123", authSecret: "321")
+	Glowfish.setCredentials(<token>, authSecret: <secret>)
 ```
 
 ### Changing the training set
 
 There may be times throughout your application to group training sets that may not necessarily correspond to each other.
 
-glowfi.sh has setup app sets specially for this purpose.
+glowfi.sh has created app sets specifically for this purpose.
 
 ```swift
 import Glowfish
@@ -26,13 +26,13 @@ import Glowfish
 Glowfish.appSet("set name")
 ```
 
-### Defining Training
+### Defining Training (data/user events sent to glowfi.sh to build recommendations)
 
 Training can be done in 2 different fashions and we'll need to know which ones your application uses.
 
-**Product/Feature/Entity** - Used for returning products that are related to a user or users that are related to a product.
+**Product/Feature/Entity** - Used for returning product recommendations that are related to a user or users that are related to a product.
 
-**Social** - Used for returning users related to another user.
+**Social** - Used for returning recommendations of users related to another user.
 
 ```swift
 import Glowfish
@@ -41,7 +41,7 @@ import Glowfish
 class AppDelegate: UIResponder, UIApplicationDelegate {
 ...
 func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-	Glowfish.setCredentials("123", authSecret: "321")
+	Glowfish.setCredentials(<token>, authSecret: <secret>)
 	Glowfish.useObjects() // training for products/features/entities
 	Glowfish.useSocial() // train for social
 ```
@@ -61,7 +61,7 @@ let user: GFUser = GFUser.create("String Id Of User")
 let product: GFResource<NSInteger> = GFObject.create("String Id of Product")
 ```
 
-#### Rating a product
+#### Sending glowfi.sh user events (ratings, likes, etc.) for training 
 
 ```swift
 let user: GFUser = GFUser.create("String Id Of User")
@@ -77,12 +77,12 @@ product.rate(user, rating: 4) {
 }
 ```
 
-#### Retrieving Predictions
+#### Retrieving Recommendations for users or objects from glowfi.sh
 
 ```swift
 let user: GFUser = GFUser.create("String Id Of User")
 let maxResults: Int = 5
-// Get objects given a single user
+// Recommend objects given a single user
 user.objectsForThis(5) {
 	(objects, error) -> Void in
 	if error != nil {
@@ -92,7 +92,7 @@ user.objectsForThis(5) {
 	}
 }
 
-// Get users given another user
+// Recommend users given another user
 user.usersForThis(maxResults) {
 	(users, error) -> Void in
 	if error != nil {
@@ -102,7 +102,7 @@ user.usersForThis(maxResults) {
 	}
 }
 
-// Get users given a single object
+// Recommend users given a single object
 let product: GFResource<NSInteger> = GFObject.create("String Id of Product")
 product.usersForThis(maxResults) {
 	(users, error) -> Void in
